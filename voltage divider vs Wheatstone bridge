@@ -1,0 +1,26 @@
+initialsg = 350;
+sgarray = [350:0.1:360];
+resistanceforrestofWS = 350;
+voltagedivider = [1000:100:11000];
+voltage = 10
+
+[X, Y] = meshgrid(sgarray, voltagedivider)
+
+voltagedivideroutput = voltage.*(Y./(X+Y));
+voltagedivideroutput = (voltage.*(Y./(initialsg+Y)))-voltagedivideroutput
+
+currentforWSwithoutsg = voltage/(2*resistanceforrestofWS)
+currentforWSwithsg = voltage./(X+resistanceforrestofWS)
+voltageforWSwithoutsg = resistanceforrestofWS*currentforWSwithoutsg
+voltageforWSwithsg = 10-(X.*currentforWSwithsg)
+straingaugeoutput = voltageforWSwithoutsg-voltageforWSwithsg
+
+meshc(X, Y, voltagedivideroutput,'FaceColor','#FF0000')
+xlabel('strain guage resistance')
+ylabel('voltage divider bottom leg')
+zlabel('change in voltage')
+hold on
+meshc(X, Y, straingaugeoutput,'FaceColor','#00FF00')
+hold off
+
+ratio = straingaugeoutput./voltagedivideroutput
