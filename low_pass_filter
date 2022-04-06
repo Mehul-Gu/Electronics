@@ -1,0 +1,65 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Apr  6 16:02:58 2022
+
+@author: mgupta
+"""
+
+#Note - This tool is meant for filling a downstream volume under choked flow. 
+#If the outlet pressure is more than 0.5 of the upstream pressure than that part is wrong.
+
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+
+#initializing nonsense - ignore
+i = 0
+n = 0
+newfrequency = 0
+Pressure = []
+XC = []
+XCarray = []
+
+#Parameters to set
+R = 1000;
+Vin = 24;
+C = np.arange(0.0000001, 0.00001, 0.0000001)
+frequency = np.arange(10, 1000, 1)
+
+#calcs with the set parameters above
+
+while i<len(frequency):
+    newfrequency = frequency[i]
+    XC = []
+    while n<len(C):
+        XCcalc = 1/(2*np.pi*newfrequency*C[n])
+        n += 1
+        XC.append(XCcalc)
+    i += 1
+    n=0
+    XCarray.append(XC)
+
+XCarray = np.array(XCarray)
+bottom = np.sqrt((R**2)+(XCarray*XCarray))
+Vout = XCarray/bottom
+Attenuation_factor = Vout/Vin
+
+#graphing part of the code
+data = np.array(Attenuation_factor)
+x, y = np.meshgrid(frequency, C*1000000)
+
+y = np.transpose(y)
+x = np.transpose(x)
+fig = plt.figure()
+ax = fig.add_subplot(1,1,1, projection='3d')
+ax.plot_surface(x, y, data)
+ax.legend()
+
+ax.set_xlabel('$Frequency (Hz)$', rotation=150)
+ax.set_ylabel('$Capacitance (μF)$')
+ax.set_zlabel(r'$Attenuation_factor$', rotation=60)
+ax.text2D(0.05, 0.95, f"Resistance = {R}Ohms", transform=ax.transAxes)
+ax.text2D(0.05, 0.92, f"Input Voltage = {Vin}V", transform=ax.transAxes)
+plt.show()
+
+
